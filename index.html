@@ -1,0 +1,577 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Drill Frenzy</title>
+<meta name="description" content="Drill Frenzy — khoan xuyên mọi khối, nối combo, sưu tầm mũi khoan và thú cưng. Miễn phí trên Google Play, iOS sắp ra mắt. / Drill through blocks, chain combos, collect diggers and pets. Free on Google Play, iOS coming soon.">
+<meta name="theme-color" content="#14301c">
+<meta property="og:type" content="website">
+<meta property="og:title" content="Drill Frenzy">
+<meta property="og:description" content="Khoan xuyên mọi thứ. Nối combo. Phá kỷ lục. · Drill through everything. Chain combos. Beat your best.">
+<meta property="og:image" content="assets/og.jpg">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="icon" type="image/png" href="assets/favicon.png">
+<link rel="apple-touch-icon" href="assets/apple-touch-icon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@600;700;800&family=Paytone+One&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --ink: #1c2230;
+    --ink-soft: #4a5368;
+    --cream: #fff6df;
+    --night: #0f2416;
+    --night-2: #14301c;
+    --green: #3fbf4f;
+    --green-dark: #258f33;
+    --orange: #f7782a;
+    --orange-dark: #c9531a;
+    --gold: #ffd54a;
+    --cyan: #5fe3ff;
+    --blue: #2ba6ff;
+    --blue-dark: #1673c9;
+    --purple: #8a5bd6;
+    --radius: 22px;
+    --display: "Paytone One", "Trebuchet MS", system-ui, sans-serif;
+    --body: "Nunito", system-ui, -apple-system, "Segoe UI", sans-serif;
+  }
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body {
+    margin: 0; font-family: var(--body); font-weight: 600; color: var(--ink); background: var(--cream);
+    line-height: 1.55; -webkit-font-smoothing: antialiased; overflow-x: hidden;
+  }
+  img, video { max-width: 100%; display: block; }
+  a { color: inherit; }
+  .wrap { width: min(1120px, 100% - 32px); margin-inline: auto; }
+
+  /* ---------- top bar ---------- */
+  .topbar { position: fixed; inset: 0 0 auto 0; z-index: 50; padding: calc(10px + env(safe-area-inset-top)) 0 10px; transition: background .25s, box-shadow .25s; }
+  .topbar.solid { background: rgba(15,36,22,.92); backdrop-filter: blur(10px); box-shadow: 0 6px 24px rgba(0,0,0,.25); }
+  .topbar .wrap { display: flex; align-items: center; gap: 14px; }
+  .brand { display: flex; align-items: center; gap: 10px; text-decoration: none; color: #fff; font-family: var(--display); font-size: 20px; letter-spacing: .3px; }
+  .brand img { width: 38px; height: 38px; border-radius: 10px; box-shadow: 0 3px 0 rgba(0,0,0,.35); }
+  .spacer { flex: 1; }
+  .nav { display: flex; gap: 22px; }
+  .nav a { color: rgba(255,255,255,.85); text-decoration: none; font-weight: 800; font-size: 15px; }
+  .nav a:hover { color: var(--gold); }
+  .lang { border: 2px solid rgba(255,255,255,.35); background: transparent; color: #fff; font: 800 13px var(--body); padding: 6px 12px; border-radius: 999px; cursor: pointer; letter-spacing: .5px; }
+  .lang:hover { border-color: var(--gold); color: var(--gold); }
+  @media (max-width: 760px) { .nav { display: none; } }
+
+  /* ---------- buttons ---------- */
+  .btn {
+    display: inline-flex; align-items: center; gap: 12px; font-family: var(--display); font-size: 20px; letter-spacing: .3px; text-decoration: none; color: #fff;
+    padding: 14px 26px 16px; border-radius: 18px; border: 3px solid #12351b;
+    background: linear-gradient(#58dc68, var(--green) 55%, var(--green-dark)); box-shadow: 0 6px 0 #146b24, 0 14px 26px rgba(0,0,0,.28);
+    text-shadow: 0 2px 0 rgba(0,0,0,.3); transition: transform .12s, box-shadow .12s;
+  }
+  .btn:hover { transform: translateY(-2px); box-shadow: 0 8px 0 #146b24, 0 18px 30px rgba(0,0,0,.3); }
+  .btn:active { transform: translateY(4px); box-shadow: 0 2px 0 #146b24, 0 6px 12px rgba(0,0,0,.3); }
+  .btn svg { width: 26px; height: 26px; flex: none; filter: drop-shadow(0 2px 0 rgba(0,0,0,.3)); }
+  .btn small { display: block; font: 800 11px var(--body); text-transform: uppercase; letter-spacing: 1px; opacity: .9; text-shadow: none; margin-bottom: -2px; }
+  .btn.sm { font-size: 15px; padding: 9px 16px 11px; border-radius: 14px; box-shadow: 0 4px 0 #146b24; }
+  /* iOS "coming soon": a real-looking button, but inert */
+  .btn.soon {
+    cursor: default; pointer-events: none; color: rgba(255,255,255,.92);
+    background: linear-gradient(#5b6479, #3b4357 60%, #2c3447); border-color: #151a26; box-shadow: 0 6px 0 #1a2030, 0 14px 26px rgba(0,0,0,.28); text-shadow: 0 2px 0 rgba(0,0,0,.35);
+    position: relative;
+  }
+  .btn.soon::after {
+    content: attr(data-badge); position: absolute; top: -12px; right: -10px; transform: rotate(6deg);
+    font: 800 11px var(--body); letter-spacing: .8px; text-transform: uppercase; color: #3a2a00; text-shadow: none;
+    background: var(--gold); border: 2px solid #b8860b; border-radius: 999px; padding: 3px 10px; box-shadow: 0 3px 0 #b8860b;
+  }
+
+  /* ---------- hero ---------- */
+  .hero {
+    position: relative; isolation: isolate; color: #fff; padding: calc(120px + env(safe-area-inset-top)) 0 120px;
+    background: radial-gradient(900px 520px at 78% 38%, rgba(255,213,74,.38), transparent 62%), radial-gradient(700px 480px at 12% 90%, rgba(95,227,255,.20), transparent 60%), linear-gradient(180deg, var(--night) 0%, var(--night-2) 100%);
+    overflow: hidden;
+  }
+  .hero::before {
+    content: ""; position: absolute; inset: 0; z-index: -1; opacity: .16;
+    background: linear-gradient(135deg, transparent 75%, #3fbf4f 75%) 0 0/96px 96px, linear-gradient(45deg, #1c2b33 25%, transparent 25%) 0 0/96px 96px;
+    mask-image: linear-gradient(180deg, transparent 0, #000 60%);
+  }
+  .hero .wrap { display: grid; grid-template-columns: 1.1fr .9fr; gap: 40px; align-items: center; }
+  .eyebrow { display: inline-block; font: 800 13px var(--body); letter-spacing: 1.6px; text-transform: uppercase; padding: 6px 14px; border-radius: 999px; background: rgba(255,213,74,.16); color: var(--gold); border: 1.5px solid rgba(255,213,74,.5); }
+  .hero h1 { font-family: var(--display); font-weight: 400; margin: 18px 0 14px; font-size: clamp(44px, 7.2vw, 88px); line-height: .98; letter-spacing: .5px; text-shadow: 0 5px 0 rgba(0,0,0,.35); }
+  .hero h1 em { font-style: normal; color: var(--gold); display: block; }
+  .hero p.lead { font-size: clamp(17px, 2.2vw, 21px); max-width: 30ch; color: rgba(255,255,255,.9); margin: 0 0 30px; }
+  .cta-row { display: flex; flex-wrap: wrap; gap: 20px 16px; align-items: center; }
+  .ghost { color: #fff; font-weight: 800; text-decoration: none; padding: 12px 6px; border-bottom: 2px solid rgba(255,255,255,.4); }
+  .ghost:hover { border-color: var(--gold); color: var(--gold); }
+  .fine { margin-top: 20px; font-size: 13px; color: rgba(255,255,255,.65); }
+
+  .hero-art { position: relative; display: flex; justify-content: center; min-height: 580px; }
+  .hero-art .phone { position: absolute; }
+  .hero-art .p1 { width: min(240px, 50%); transform: translate(-50%, 34px) rotate(-8deg); z-index: 1; animation: floaty 7s ease-in-out infinite; }
+  .hero-art .p2 { width: min(300px, 60%); z-index: 3; transform: translateY(-6px); animation: floaty 6s ease-in-out -2s infinite; }
+  .hero-art .p3 { width: min(240px, 50%); transform: translate(50%, 46px) rotate(8deg); z-index: 2; animation: floaty 8s ease-in-out -4s infinite; }
+  @keyframes floaty { 50% { translate: 0 -12px; } }
+  .glow { position: absolute; width: 420px; height: 420px; border-radius: 50%; left: 50%; top: 46%; translate: -50% -50%; background: radial-gradient(circle, rgba(255,213,74,.55), rgba(255,213,74,0) 65%); filter: blur(6px); z-index: 0; }
+  .spark { position: absolute; width: 14px; height: 14px; background: var(--gold); z-index: 4; clip-path: polygon(50% 0, 62% 38%, 100% 50%, 62% 62%, 50% 100%, 38% 62%, 0 50%, 38% 38%); animation: twinkle 3s ease-in-out infinite; }
+  .spark.c { background: var(--cyan); }
+  @keyframes twinkle { 0%,100% { transform: scale(.4); opacity: .3; } 50% { transform: scale(1.3); opacity: 1; } }
+  @media (max-width: 880px) {
+    .hero { padding-bottom: 150px; }
+    .hero .wrap { grid-template-columns: 1fr; text-align: center; }
+    .hero p.lead { margin-inline: auto; }
+    .cta-row { justify-content: center; }
+    .hero-art { min-height: 480px; margin-top: 8px; }
+  }
+
+  /* phone frame (image or video) */
+  .phone { border-radius: 34px; padding: 7px; background: #0b0f14; box-shadow: 0 0 0 2px #2b3442, 0 28px 50px rgba(0,0,0,.45), inset 0 0 0 2px #1b222c; }
+  .phone > img { border-radius: 27px; width: 100%; aspect-ratio: 1242 / 2688; object-fit: cover; background: #111; }
+  .vid { position: relative; border-radius: 27px; overflow: hidden; background: #111; aspect-ratio: 540 / 974; }
+  .vid video { width: 100%; height: 100%; object-fit: cover; }
+  .snd {
+    position: absolute; right: 10px; bottom: 10px; width: 40px; height: 40px; border-radius: 50%; border: 2px solid rgba(255,255,255,.6);
+    background: rgba(0,0,0,.55); color: #fff; font-size: 18px; line-height: 1; cursor: pointer; backdrop-filter: blur(4px); transition: transform .12s, background .12s;
+  }
+  .snd:hover { transform: scale(1.08); background: rgba(0,0,0,.75); }
+  .snd.on { background: var(--green); border-color: #fff; }
+
+  .wave { position: absolute; left: 0; right: 0; bottom: -1px; height: 70px; z-index: 5; }
+  .wave path { fill: var(--cream); }
+
+  /* ---------- stats ---------- */
+  .stats { margin-top: -34px; position: relative; z-index: 6; }
+  .stats .wrap { display: grid; grid-template-columns: repeat(4, 1fr); background: #fff; border-radius: 26px; border: 3px solid #e7c98b; box-shadow: 0 8px 0 #d6b270, 0 24px 40px rgba(60,40,0,.18); overflow: hidden; }
+  .stat { padding: 22px 12px; text-align: center; border-right: 2px dashed #ecd7a6; }
+  .stat:last-child { border-right: 0; }
+  .stat b { display: block; font: 400 clamp(30px, 4.6vw, 46px)/1 var(--display); color: var(--orange); text-shadow: 0 3px 0 #ffd7b3; }
+  .stat span { font-size: 14px; color: var(--ink-soft); font-weight: 800; }
+  @media (max-width: 640px) {
+    .stats .wrap { grid-template-columns: repeat(2, 1fr); }
+    .stat:nth-child(2) { border-right: 0; }
+    .stat:nth-child(-n+2) { border-bottom: 2px dashed #ecd7a6; }
+  }
+
+  /* ---------- sections ---------- */
+  section.block { padding: 96px 0 8px; }
+  .ribbon-wrap { text-align: center; margin-bottom: 14px; }
+  .ribbon { display: inline-block; position: relative; padding: 12px 54px 14px; color: #fff; font: 400 clamp(22px, 3.6vw, 34px)/1.1 var(--display); letter-spacing: .5px; text-shadow: 0 3px 0 rgba(0,0,0,.3); background: linear-gradient(#52c0ff, var(--blue) 55%, var(--blue-dark)); border: 3px solid #0e4f8c; border-radius: 14px; box-shadow: 0 6px 0 #0b3d6d; margin: 0; }
+  .ribbon::before, .ribbon::after { content: ""; position: absolute; top: 12px; width: 34px; height: 100%; background: var(--blue-dark); z-index: -1; border: 3px solid #0e4f8c; }
+  .ribbon::before { left: -24px; clip-path: polygon(0 0, 100% 0, 100% 100%, 0 100%, 28% 50%); }
+  .ribbon::after { right: -24px; clip-path: polygon(0 0, 100% 0, 72% 50%, 100% 100%, 0 100%); }
+  .sub { text-align: center; color: var(--ink-soft); max-width: 56ch; margin: 18px auto 0; font-size: 18px; }
+
+  .cards { display: grid; grid-template-columns: repeat(3, 1fr); gap: 22px; margin-top: 46px; }
+  .card { background: #fff; border-radius: var(--radius); padding: 28px 24px 26px; border: 3px solid #f0d9a4; box-shadow: 0 6px 0 #e3c37f, 0 18px 30px rgba(80,50,0,.10); transition: transform .2s; }
+  .card:hover { transform: translateY(-5px) rotate(-.4deg); }
+  .card .ico { width: 66px; height: 66px; border-radius: 20px; display: grid; place-items: center; margin-bottom: 14px; font-size: 34px; border: 3px solid rgba(0,0,0,.18); box-shadow: 0 4px 0 rgba(0,0,0,.18); }
+  .card h3 { font: 400 23px/1.15 var(--display); margin: 0 0 8px; letter-spacing: .3px; }
+  .card p { margin: 0; color: var(--ink-soft); }
+  .i-orange { background: linear-gradient(#ffb36e, var(--orange)); }
+  .i-green { background: linear-gradient(#7ee88a, var(--green)); }
+  .i-blue { background: linear-gradient(#8fd5ff, var(--blue)); }
+  .i-purple { background: linear-gradient(#c1a2f5, var(--purple)); }
+  .i-gold { background: linear-gradient(#ffe88c, #f5b31d); }
+  .i-pink { background: linear-gradient(#ffa9c4, #ee5c8c); }
+  @media (max-width: 900px) { .cards { grid-template-columns: 1fr; } }
+  @media (min-width: 901px) and (max-width: 1060px) { .cards { grid-template-columns: repeat(2, 1fr); } }
+
+  .row { display: grid; grid-template-columns: 1fr 1fr; gap: 56px; align-items: center; margin-top: 90px; }
+  .row.flip .art { order: 2; }
+  .row .art { display: flex; justify-content: center; position: relative; }
+  .row .art .phone { width: min(290px, 78%); transform: rotate(-3deg); }
+  .row.flip .art .phone { transform: rotate(3deg); }
+  .row .art::before { content: ""; position: absolute; inset: 8% 6%; border-radius: 50%; z-index: -1; background: radial-gradient(circle, var(--gold), transparent 68%); opacity: .55; filter: blur(14px); }
+  .tag { display: inline-block; font: 800 12px var(--body); letter-spacing: 1.4px; text-transform: uppercase; color: var(--orange-dark); background: #ffe3c4; border: 2px solid #f4b97d; padding: 4px 12px; border-radius: 999px; margin-bottom: 14px; }
+  .row h3 { font: 400 clamp(28px, 4vw, 42px)/1.05 var(--display); margin: 0 0 14px; }
+  .row p { font-size: 18px; color: var(--ink-soft); margin: 0 0 14px; }
+  .ticks { list-style: none; padding: 0; margin: 18px 0 0; display: grid; gap: 10px; }
+  .ticks li { display: flex; gap: 12px; align-items: flex-start; font-weight: 800; }
+  .ticks li::before { content: "✓"; flex: none; width: 26px; height: 26px; border-radius: 50%; background: var(--green); color: #fff; display: grid; place-items: center; font-size: 15px; border: 2px solid var(--green-dark); margin-top: 1px; }
+  @media (max-width: 860px) { .row { grid-template-columns: 1fr; gap: 30px; margin-top: 70px; } .row.flip .art { order: 0; } }
+
+  /* rails (videos + screenshots) */
+  .band { margin-top: 90px; padding: 84px 0 96px; color: #fff; position: relative; }
+  .band.night { background: linear-gradient(180deg, var(--night-2), var(--night)); }
+  .band.deep { background: linear-gradient(180deg, var(--night), #1b1440); }
+  .rail { display: flex; gap: 22px; overflow-x: auto; scroll-snap-type: x mandatory; padding: 46px 24px 30px; scrollbar-width: none; -webkit-overflow-scrolling: touch; }
+  .rail::-webkit-scrollbar { display: none; }
+  .rail figure { margin: 0; flex: none; width: min(250px, 66vw); scroll-snap-align: center; text-align: center; }
+  .rail figcaption { margin-top: 14px; font-weight: 800; color: rgba(255,255,255,.88); font-size: 15px; }
+  .rail-nav { display: flex; justify-content: center; gap: 12px; }
+  .rail-nav button { width: 48px; height: 48px; border-radius: 50%; border: 2px solid rgba(255,255,255,.4); background: rgba(255,255,255,.08); color: #fff; font-size: 20px; cursor: pointer; transition: .15s; }
+  .rail-nav button:hover { background: var(--gold); color: #3a2a00; border-color: var(--gold); }
+  @media (min-width: 1300px) { .rail { justify-content: center; } }
+  .band .sub { color: rgba(255,255,255,.75); }
+
+  /* final CTA */
+  .final { padding: 100px 0 90px; text-align: center; background: var(--cream); }
+  .final h2 { font: 400 clamp(32px, 5.4vw, 60px)/1.05 var(--display); margin: 0 0 14px; }
+  .final p { font-size: 19px; color: var(--ink-soft); margin: 0 auto 30px; max-width: 46ch; }
+  .final .cta-row { justify-content: center; }
+  .final .btn { font-size: 24px; padding: 18px 34px 20px; }
+  .final .icon { width: 124px; height: 124px; border-radius: 30px; margin: 0 auto 26px; box-shadow: 0 8px 0 rgba(0,0,0,.2), 0 22px 36px rgba(0,0,0,.25); border: 4px solid #fff; animation: floaty 5s ease-in-out infinite; }
+
+  footer { background: var(--night); color: rgba(255,255,255,.75); padding: 38px 0 calc(38px + env(safe-area-inset-bottom)); font-size: 14px; }
+  footer .wrap { display: flex; flex-wrap: wrap; gap: 14px 32px; align-items: center; justify-content: space-between; }
+  footer nav { display: flex; gap: 22px; flex-wrap: wrap; }
+  footer a { text-decoration: none; font-weight: 800; }
+  footer a:hover { color: var(--gold); }
+  footer .tm { flex-basis: 100%; font-size: 12px; opacity: .6; }
+
+  .reveal { opacity: 0; transform: translateY(26px); transition: opacity .7s ease, transform .7s ease; }
+  .reveal.in { opacity: 1; transform: none; }
+  @media (prefers-reduced-motion: reduce) {
+    html { scroll-behavior: auto; }
+    .reveal { opacity: 1; transform: none; transition: none; }
+    .phone, .spark, .final .icon { animation: none !important; }
+  }
+</style>
+</head>
+<body>
+
+<header class="topbar" id="top">
+  <div class="wrap">
+    <a class="brand" href="#top"><img src="assets/icon.png" alt="" width="38" height="38"><span>Drill Frenzy</span></a>
+    <span class="spacer"></span>
+    <nav class="nav">
+      <a href="#features" data-i18n="nav_features">Tính năng</a>
+      <a href="#more" data-i18n="nav_more">Xem game chạy</a>
+      <a href="#gallery" data-i18n="nav_gallery">Hình ảnh</a>
+    </nav>
+    <button class="lang" id="langBtn" type="button" aria-label="Language">EN</button>
+    <a class="btn sm" href="https://play.google.com/store/apps/details?id=com.bachtuoc.drillfrenzy" data-i18n="get_short">Tải game</a>
+  </div>
+</header>
+
+<main>
+  <!-- ================= HERO ================= -->
+  <section class="hero">
+    <div class="wrap">
+      <div>
+        <span class="eyebrow" data-i18n="eyebrow">Miễn phí · Android · iOS sắp ra mắt</span>
+        <h1><span data-i18n="h1a">Khoan xuyên mọi thứ.</span> <em data-i18n="h1b">Nối combo!</em></h1>
+        <p class="lead" data-i18n="lead">Điều khiển mũi khoan xuyên qua các khối màu, nối chuỗi combo, sưu tầm thú cưng bông mềm và phá kỷ lục của chính bạn.</p>
+        <div class="cta-row">
+          <a class="btn" href="https://play.google.com/store/apps/details?id=com.bachtuoc.drillfrenzy">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path fill="#fff" d="M4 2.6v18.8c0 .6.7 1 1.2.7l15-9.4c.5-.3.5-1 0-1.4L5.2 1.9C4.7 1.6 4 2 4 2.6z"/></svg>
+            <span><small data-i18n="get_small">Có mặt trên</small>Google Play</span>
+          </a>
+          <span class="btn soon" data-badge="Soon" role="button" aria-disabled="true" data-i18n-attr="data-badge:soon_badge">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path fill="#fff" d="M7 2h10a2 2 0 0 1 2 2v16a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2zm5 17.2a1.1 1.1 0 1 0 0-2.2 1.1 1.1 0 0 0 0 2.2zM7.5 4.5v11h9v-11z"/></svg>
+            <span><small data-i18n="ios_small">Dành cho</small>iOS</span>
+          </span>
+        </div>
+        <p class="fine" data-i18n="fine">Có quảng cáo và mua hàng trong ứng dụng (tùy chọn).</p>
+      </div>
+      <div class="hero-art">
+        <div class="glow" aria-hidden="true"></div>
+        <span class="spark" style="left:8%;top:12%" aria-hidden="true"></span>
+        <span class="spark c" style="right:6%;top:6%;animation-delay:-1s" aria-hidden="true"></span>
+        <span class="spark" style="right:14%;bottom:12%;animation-delay:-2s" aria-hidden="true"></span>
+        <span class="spark c" style="left:16%;bottom:8%;animation-delay:-.5s" aria-hidden="true"></span>
+        <div class="phone p1" aria-hidden="true"><img src="assets/shot-05.jpg" alt="" loading="eager"></div>
+        <div class="phone p3" aria-hidden="true"><img src="assets/shot-06.jpg" alt="" loading="eager"></div>
+        <div class="phone p2">
+          <div class="vid"><video autoplay muted loop playsinline preload="auto" poster="assets/video/hero.jpg" data-hero><source src="assets/video/hero.mp4" type="video/mp4"></video><button class="snd" type="button" aria-label="Sound">🔇</button></div>
+        </div>
+      </div>
+    </div>
+    <svg class="wave" viewBox="0 0 1440 70" preserveAspectRatio="none" aria-hidden="true"><path d="M0,40 C240,90 480,0 720,30 C960,60 1200,90 1440,30 L1440,70 L0,70 Z"/></svg>
+  </section>
+
+  <!-- ================= STATS ================= -->
+  <div class="stats">
+    <div class="wrap reveal">
+      <div class="stat"><b>23</b><span data-i18n="st1">mũi khoan</span></div>
+      <div class="stat"><b>50+</b><span data-i18n="st2">món sưu tầm</span></div>
+      <div class="stat"><b>2</b><span data-i18n="st3">ngôn ngữ · VI / EN</span></div>
+      <div class="stat"><b>0₫</b><span data-i18n="st4">để bắt đầu chơi</span></div>
+    </div>
+  </div>
+
+  <!-- ================= FEATURES ================= -->
+  <section class="block wrap" id="features">
+    <div class="ribbon-wrap reveal"><h2 class="ribbon" data-i18n="feat_title">Vì sao bạn sẽ nghiện</h2></div>
+    <p class="sub reveal" data-i18n="feat_sub">Một ván chỉ vài chục giây, nhưng muốn dừng lại thì khó đấy.</p>
+
+    <div class="cards">
+      <article class="card reveal"><div class="ico i-orange">⛏️</div><h3 data-i18n="c1t">Khoan là sướng</h3><p data-i18n="c1p">Chạm là khoan, khối vỡ tung tóe, xu bay đầy màn hình. Nối chuỗi combo để nhân điểm.</p></article>
+      <article class="card reveal"><div class="ico i-pink">🐾</div><h3 data-i18n="c2t">Thú cưng bông mềm</h3><p data-i18n="c2p">Sưu tầm các bé thú cưng. Mỗi bé có buff riêng và kỹ năng đặc biệt giúp bạn kiếm thêm xu.</p></article>
+      <article class="card reveal"><div class="ico i-gold">📦</div><h3 data-i18n="c3t">Rương và chìa khóa</h3><p data-i18n="c3p">Nhặt chìa khóa khi khoan, mở rương để nhận mũi khoan, thú cưng và phụ kiện hiếm.</p></article>
+      <article class="card reveal"><div class="ico i-blue">🏆</div><h3 data-i18n="c4t">Bảng Phong Thần</h3><p data-i18n="c4p">Leo bảng xếp hạng và so điểm với người chơi khác. Mỗi điểm cao mới đều có chỗ để khoe.</p></article>
+      <article class="card reveal"><div class="ico i-green">📅</div><h3 data-i18n="c5t">Mỗi ngày một quà</h3><p data-i18n="c5p">Nhiệm vụ hằng ngày, điểm danh hằng tháng và sự kiện giới hạn thời gian kèm minigame.</p></article>
+      <article class="card reveal"><div class="ico i-purple">🌏</div><h3 data-i18n="c6t">Tiếng Việt và English</h3><p data-i18n="c6p">Giao diện đầy đủ hai ngôn ngữ, đổi qua lại ngay trong phần Cài đặt.</p></article>
+    </div>
+
+    <!-- video rows -->
+    <div class="row">
+      <div class="art reveal"><div class="phone"><div class="vid"><video muted loop playsinline preload="none" poster="assets/video/gameplay.jpg" data-src="assets/video/gameplay.mp4"></video><button class="snd" type="button" aria-label="Sound">🔇</button></div></div></div>
+      <div class="reveal">
+        <span class="tag" data-i18n="r1tag">Gameplay</span>
+        <h3 data-i18n="r1t">Khoan, nối combo, phá kỷ lục</h3>
+        <p data-i18n="r1p">Chạm để khoan xuyên từng lớp khối. Càng khoan liên tục, combo càng cao và mỗi khối vỡ càng cho nhiều điểm.</p>
+        <ul class="ticks">
+          <li data-i18n="r1a">Combo nhân điểm lên tới x5 và hơn thế</li>
+          <li data-i18n="r1b">Nhặt xu, sao, chìa khóa và kim cương giữa ván</li>
+          <li data-i18n="r1c">Thú cưng tung kỹ năng đúng lúc để cứu ván</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="row flip">
+      <div class="art reveal"><div class="phone"><div class="vid"><video muted loop playsinline preload="none" poster="assets/video/chest.jpg" data-src="assets/video/chest.mp4"></video><button class="snd" type="button" aria-label="Sound">🔇</button></div></div></div>
+      <div class="reveal">
+        <span class="tag" data-i18n="r2tag">Rương</span>
+        <h3 data-i18n="r2t">Mở rương, bất ngờ liền tay</h3>
+        <p data-i18n="r2p">Gom chìa khóa trong lúc khoan rồi mở rương để nhận xu, mũi khoan, thú cưng và phụ kiện. Mỗi lần mở là một lần hồi hộp.</p>
+        <ul class="ticks">
+          <li data-i18n="r2a">Ba loại rương, ba loại chìa khóa</li>
+          <li data-i18n="r2b">Mở một lần hoặc mở liền x10</li>
+          <li data-i18n="r2c">Xem được tỉ lệ rơi đồ ngay trong game</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="art reveal"><div class="phone"><div class="vid"><video muted loop playsinline preload="none" poster="assets/video/digger.jpg" data-src="assets/video/digger.mp4"></video><button class="snd" type="button" aria-label="Sound">🔇</button></div></div></div>
+      <div class="reveal">
+        <span class="tag" data-i18n="r3tag">Mũi khoan</span>
+        <h3 data-i18n="r3t">Mũi khoan nào cũng ngầu</h3>
+        <p data-i18n="r3p">Từ sừng kỳ lân đến miếng pizza, củ cải trắng hay mũi khoan ong vằn: bất cứ thứ gì nhọn cũng khoan được. Chọn kiểu bạn thích.</p>
+        <ul class="ticks">
+          <li data-i18n="r3a">23 mũi khoan với nhiều độ hiếm</li>
+          <li data-i18n="r3b">Nâng cấp sức mạnh theo cách của bạn</li>
+          <li data-i18n="r3c">Xem trước 3D trước khi chọn</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="row flip">
+      <div class="art reveal"><div class="phone"><div class="vid"><video muted loop playsinline preload="none" poster="assets/video/pets.jpg" data-src="assets/video/pets.mp4"></video><button class="snd" type="button" aria-label="Sound">🔇</button></div></div></div>
+      <div class="reveal">
+        <span class="tag" data-i18n="r4tag">Thú cưng</span>
+        <h3 data-i18n="r4t">Thú cưng và tủ đồ phụ kiện</h3>
+        <p data-i18n="r4p">Mỗi bé thú cưng có một tủ đồ riêng: mũ, nơ, vòng hoa, kính và nhiều thứ nữa. Mặc xong là có ngay một người bạn đồng hành thật phong cách.</p>
+        <ul class="ticks">
+          <li data-i18n="r4a">Phụ kiện vừa khít từng bé thú cưng</li>
+          <li data-i18n="r4b">Buff ngầm tăng xu mỗi lượt chơi</li>
+          <li data-i18n="r4c">Kỹ năng riêng, bấm để tung chiêu</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= MORE VIDEOS ================= -->
+  <section class="band night" id="more">
+    <div class="ribbon-wrap reveal"><h2 class="ribbon" data-i18n="more_title">Còn nhiều hơn thế nữa</h2></div>
+    <p class="sub reveal" data-i18n="more_sub">Bấm biểu tượng loa trên mỗi video để bật tiếng.</p>
+    <div class="rail" id="vrail">
+      <figure><div class="phone"><div class="vid"><video muted loop playsinline preload="none" poster="assets/video/petupgrade.jpg" data-src="assets/video/petupgrade.mp4"></video><button class="snd" type="button" aria-label="Sound">🔇</button></div></div><figcaption data-i18n="m1">Nâng cấp thú cưng</figcaption></figure>
+      <figure><div class="phone"><div class="vid"><video muted loop playsinline preload="none" poster="assets/video/album.jpg" data-src="assets/video/album.mp4"></video><button class="snd" type="button" aria-label="Sound">🔇</button></div></div><figcaption data-i18n="m2">Sổ sưu tầm</figcaption></figure>
+      <figure><div class="phone"><div class="vid"><video muted loop playsinline preload="none" poster="assets/video/event.jpg" data-src="assets/video/event.mp4"></video><button class="snd" type="button" aria-label="Sound">🔇</button></div></div><figcaption data-i18n="m3">Sự kiện và minigame</figcaption></figure>
+      <figure><div class="phone"><div class="vid"><video muted loop playsinline preload="none" poster="assets/video/daily.jpg" data-src="assets/video/daily.mp4"></video><button class="snd" type="button" aria-label="Sound">🔇</button></div></div><figcaption data-i18n="m4">Quà và điểm danh</figcaption></figure>
+      <figure><div class="phone"><div class="vid"><video muted loop playsinline preload="none" poster="assets/video/leaderboard.jpg" data-src="assets/video/leaderboard.mp4"></video><button class="snd" type="button" aria-label="Sound">🔇</button></div></div><figcaption data-i18n="m5">Phá kỷ lục, lên bảng</figcaption></figure>
+    </div>
+    <div class="rail-nav">
+      <button type="button" data-rail="vrail" data-dir="-1" aria-label="Previous">←</button>
+      <button type="button" data-rail="vrail" data-dir="1" aria-label="Next">→</button>
+    </div>
+  </section>
+
+  <!-- ================= SCREENSHOTS ================= -->
+  <section class="band deep" id="gallery" style="margin-top:0">
+    <div class="ribbon-wrap reveal"><h2 class="ribbon" data-i18n="gal_title">Nhìn qua một chút</h2></div>
+    <div class="rail" id="rail">
+      <figure><div class="phone"><img src="assets/shot-01.jpg" alt="" loading="lazy"></div><figcaption data-i18n="g1">Combo nổ tung</figcaption></figure>
+      <figure><div class="phone"><img src="assets/shot-02.jpg" alt="" loading="lazy"></div><figcaption data-i18n="g2">Khoan xuyên mọi khối</figcaption></figure>
+      <figure><div class="phone"><img src="assets/shot-03.jpg" alt="" loading="lazy"></div><figcaption data-i18n="g3">Màn hình chính</figcaption></figure>
+      <figure><div class="phone"><img src="assets/shot-04.jpg" alt="" loading="lazy"></div><figcaption data-i18n="g4">Mũi khoan độc đáo</figcaption></figure>
+      <figure><div class="phone"><img src="assets/shot-05.jpg" alt="" loading="lazy"></div><figcaption data-i18n="g5">Thú cưng của bạn</figcaption></figure>
+      <figure><div class="phone"><img src="assets/shot-06.jpg" alt="" loading="lazy"></div><figcaption data-i18n="g6">Mở rương nhận quà</figcaption></figure>
+      <figure><div class="phone"><img src="assets/shot-07.jpg" alt="" loading="lazy"></div><figcaption data-i18n="g7">Bảng Phong Thần</figcaption></figure>
+      <figure><div class="phone"><img src="assets/shot-08.jpg" alt="" loading="lazy"></div><figcaption data-i18n="g8">Sổ sưu tầm</figcaption></figure>
+    </div>
+    <div class="rail-nav">
+      <button type="button" data-rail="rail" data-dir="-1" aria-label="Previous">←</button>
+      <button type="button" data-rail="rail" data-dir="1" aria-label="Next">→</button>
+    </div>
+  </section>
+
+  <!-- ================= FINAL CTA ================= -->
+  <section class="final">
+    <div class="wrap reveal">
+      <img class="icon" src="assets/icon.png" alt="Drill Frenzy" width="124" height="124">
+      <h2 data-i18n="fin_t">Sẵn sàng khoan chưa?</h2>
+      <p data-i18n="fin_p">Tải Drill Frenzy miễn phí trên Android. Bản iOS đang trên đường tới.</p>
+      <div class="cta-row">
+        <a class="btn" href="https://play.google.com/store/apps/details?id=com.bachtuoc.drillfrenzy">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path fill="#fff" d="M4 2.6v18.8c0 .6.7 1 1.2.7l15-9.4c.5-.3.5-1 0-1.4L5.2 1.9C4.7 1.6 4 2 4 2.6z"/></svg>
+          <span><small data-i18n="get_small2">Tải trên</small>Google Play</span>
+        </a>
+        <span class="btn soon" data-badge="Soon" role="button" aria-disabled="true" data-i18n-attr="data-badge:soon_badge">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path fill="#fff" d="M7 2h10a2 2 0 0 1 2 2v16a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2zm5 17.2a1.1 1.1 0 1 0 0-2.2 1.1 1.1 0 0 0 0 2.2zM7.5 4.5v11h9v-11z"/></svg>
+          <span><small data-i18n="ios_small2">Bản dành cho</small>iOS</span>
+        </span>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <div class="wrap">
+    <span>© 2026 Drill Frenzy</span>
+    <nav>
+      <a href="https://sites.google.com/view/drill-frenzy-privacy-policy" data-i18n="f_priv">Chính sách quyền riêng tư</a>
+      <a href="https://play.google.com/store/apps/details?id=com.bachtuoc.drillfrenzy">Google Play</a>
+    </nav>
+    <span class="tm">Google Play and the Google Play logo are trademarks of Google LLC.</span>
+  </div>
+</footer>
+
+<script>
+(function () {
+  var D = {
+    vi: {
+      nav_features: "Tính năng", nav_more: "Xem game chạy", nav_gallery: "Hình ảnh", get_short: "Tải game",
+      eyebrow: "Miễn phí · Android · iOS sắp ra mắt", h1a: "Khoan xuyên mọi thứ.", h1b: "Nối combo!",
+      lead: "Điều khiển mũi khoan xuyên qua các khối màu, nối chuỗi combo, sưu tầm thú cưng bông mềm và phá kỷ lục của chính bạn.",
+      get_small: "Có mặt trên", get_small2: "Tải trên", ios_small: "Dành cho", ios_small2: "Bản dành cho", soon_badge: "Sắp ra mắt",
+      fine: "Có quảng cáo và mua hàng trong ứng dụng (tùy chọn).",
+      st1: "mũi khoan", st2: "món sưu tầm", st3: "ngôn ngữ · VI / EN", st4: "để bắt đầu chơi",
+      feat_title: "Vì sao bạn sẽ nghiện", feat_sub: "Một ván chỉ vài chục giây, nhưng muốn dừng lại thì khó đấy.",
+      c1t: "Khoan là sướng", c1p: "Chạm là khoan, khối vỡ tung tóe, xu bay đầy màn hình. Nối chuỗi combo để nhân điểm.",
+      c2t: "Thú cưng bông mềm", c2p: "Sưu tầm các bé thú cưng. Mỗi bé có buff riêng và kỹ năng đặc biệt giúp bạn kiếm thêm xu.",
+      c3t: "Rương và chìa khóa", c3p: "Nhặt chìa khóa khi khoan, mở rương để nhận mũi khoan, thú cưng và phụ kiện hiếm.",
+      c4t: "Bảng Phong Thần", c4p: "Leo bảng xếp hạng và so điểm với người chơi khác. Mỗi điểm cao mới đều có chỗ để khoe.",
+      c5t: "Mỗi ngày một quà", c5p: "Nhiệm vụ hằng ngày, điểm danh hằng tháng và sự kiện giới hạn thời gian kèm minigame.",
+      c6t: "Tiếng Việt và English", c6p: "Giao diện đầy đủ hai ngôn ngữ, đổi qua lại ngay trong phần Cài đặt.",
+      r1tag: "Gameplay", r1t: "Khoan, nối combo, phá kỷ lục",
+      r1p: "Chạm để khoan xuyên từng lớp khối. Càng khoan liên tục, combo càng cao và mỗi khối vỡ càng cho nhiều điểm.",
+      r1a: "Combo nhân điểm lên tới x5 và hơn thế", r1b: "Nhặt xu, sao, chìa khóa và kim cương giữa ván", r1c: "Thú cưng tung kỹ năng đúng lúc để cứu ván",
+      r2tag: "Rương", r2t: "Mở rương, bất ngờ liền tay",
+      r2p: "Gom chìa khóa trong lúc khoan rồi mở rương để nhận xu, mũi khoan, thú cưng và phụ kiện. Mỗi lần mở là một lần hồi hộp.",
+      r2a: "Ba loại rương, ba loại chìa khóa", r2b: "Mở một lần hoặc mở liền x10", r2c: "Xem được tỉ lệ rơi đồ ngay trong game",
+      r3tag: "Mũi khoan", r3t: "Mũi khoan nào cũng ngầu",
+      r3p: "Từ sừng kỳ lân đến miếng pizza, củ cải trắng hay mũi khoan ong vằn: bất cứ thứ gì nhọn cũng khoan được. Chọn kiểu bạn thích.",
+      r3a: "23 mũi khoan với nhiều độ hiếm", r3b: "Nâng cấp sức mạnh theo cách của bạn", r3c: "Xem trước 3D trước khi chọn",
+      r4tag: "Thú cưng", r4t: "Thú cưng và tủ đồ phụ kiện",
+      r4p: "Mỗi bé thú cưng có một tủ đồ riêng: mũ, nơ, vòng hoa, kính và nhiều thứ nữa. Mặc xong là có ngay một người bạn đồng hành thật phong cách.",
+      r4a: "Phụ kiện vừa khít từng bé thú cưng", r4b: "Buff ngầm tăng xu mỗi lượt chơi", r4c: "Kỹ năng riêng, bấm để tung chiêu",
+      more_title: "Còn nhiều hơn thế nữa", more_sub: "Bấm biểu tượng loa trên mỗi video để bật tiếng.",
+      m1: "Nâng cấp thú cưng", m2: "Sổ sưu tầm", m3: "Sự kiện và minigame", m4: "Quà và điểm danh", m5: "Phá kỷ lục, lên bảng",
+      gal_title: "Nhìn qua một chút",
+      g1: "Combo nổ tung", g2: "Khoan xuyên mọi khối", g3: "Màn hình chính", g4: "Mũi khoan độc đáo",
+      g5: "Thú cưng của bạn", g6: "Mở rương nhận quà", g7: "Bảng Phong Thần", g8: "Sổ sưu tầm",
+      fin_t: "Sẵn sàng khoan chưa?", fin_p: "Tải Drill Frenzy miễn phí trên Android. Bản iOS đang trên đường tới.",
+      f_priv: "Chính sách quyền riêng tư"
+    },
+    en: {
+      nav_features: "Features", nav_more: "See it in action", nav_gallery: "Gallery", get_short: "Get it",
+      eyebrow: "Free · Android · iOS coming soon", h1a: "Drill through everything.", h1b: "Chain combos!",
+      lead: "Steer your drill through colorful blocks, chain huge combos, collect plush pets and beat your own high score.",
+      get_small: "Get it on", get_small2: "Get it on", ios_small: "For", ios_small2: "Also for", soon_badge: "Coming soon",
+      fine: "Contains ads and optional in-app purchases.",
+      st1: "diggers", st2: "collectibles", st3: "languages · VI / EN", st4: "to start playing",
+      feat_title: "Why you'll get hooked", feat_sub: "A run lasts seconds, but stopping at just one is the hard part.",
+      c1t: "Drilling feels great", c1p: "Tap to drill, blocks burst everywhere and coins fly across the screen. Chain combos to multiply your score.",
+      c2t: "Plush pet companions", c2p: "Collect adorable pets. Each one brings its own passive buff and a special skill that earns you extra coins.",
+      c3t: "Chests and keys", c3p: "Grab keys while you drill, then open chests for rare diggers, pets and accessories.",
+      c4t: "The Legend Board", c4p: "Climb the leaderboard and compare scores with other players. Every new high score has a place to shine.",
+      c5t: "A gift every day", c5p: "Daily quests, a monthly check-in and limited-time events with their own minigames.",
+      c6t: "Tiếng Việt and English", c6p: "Fully localized in two languages — switch any time from Settings.",
+      r1tag: "Gameplay", r1t: "Drill, chain combos, break records",
+      r1p: "Tap to drill through layer after layer. The longer you chain, the higher the combo and the more every block is worth.",
+      r1a: "Score multipliers up to x5 and beyond", r1b: "Grab coins, stars, keys and diamonds mid-run", r1c: "Your pet fires its skill at just the right moment",
+      r2tag: "Chests", r2t: "Open chests, get surprises",
+      r2p: "Collect keys while you drill, then open chests for coins, diggers, pets and accessories. Every opening is a little thrill.",
+      r2a: "Three chest tiers, three key types", r2b: "Open once or go x10", r2c: "See the drop odds right inside the game",
+      r3tag: "Diggers", r3t: "Every digger looks awesome",
+      r3p: "From a unicorn horn to a slice of pizza, a daikon or a bumblebee drill: anything pointy can drill. Pick your style.",
+      r3a: "23 diggers across many rarities", r3b: "Upgrade your power your way", r3c: "3D preview before you equip",
+      r4tag: "Pets", r4t: "Pets and a wardrobe of accessories",
+      r4p: "Every pet has its own wardrobe: hats, bows, flower crowns, glasses and more. Dress it up and you've got a stylish sidekick.",
+      r4a: "Accessories that fit each pet", r4b: "Passive buff boosts coins per run", r4c: "Unique skills — tap to unleash",
+      more_title: "And there's more", more_sub: "Tap the speaker icon on any video to turn the sound on.",
+      m1: "Pet upgrades", m2: "Collection album", m3: "Events and minigames", m4: "Gifts and check-in", m5: "Break records, climb the board",
+      gal_title: "A quick look",
+      g1: "Combo explosion", g2: "Drill through blocks", g3: "Main menu", g4: "Unique diggers",
+      g5: "Your pets", g6: "Open chests for loot", g7: "The Legend Board", g8: "Collection album",
+      fin_t: "Ready to drill?", fin_p: "Download Drill Frenzy for free on Android. The iOS version is on its way.",
+      f_priv: "Privacy Policy"
+    }
+  };
+
+  var html = document.documentElement, langBtn = document.getElementById("langBtn");
+  function setLang(l) {
+    var t = D[l]; html.lang = l;
+    document.querySelectorAll("[data-i18n]").forEach(function (el) { var v = t[el.dataset.i18n]; if (v) el.textContent = v; });
+    document.querySelectorAll("[data-i18n-attr]").forEach(function (el) {
+      var p = el.dataset.i18nAttr.split(":"); if (t[p[1]]) el.setAttribute(p[0], t[p[1]]);
+    });
+    langBtn.textContent = l === "vi" ? "EN" : "VI";
+    try { localStorage.setItem("df-lang", l); } catch (e) {}
+  }
+  var saved = null; try { saved = localStorage.getItem("df-lang"); } catch (e) {}
+  setLang(saved || ((navigator.language || "vi").toLowerCase().indexOf("vi") === 0 ? "vi" : "en"));
+  langBtn.addEventListener("click", function () { setLang(html.lang === "vi" ? "en" : "vi"); });
+
+  var bar = document.querySelector(".topbar");
+  function onScroll() { bar.classList.toggle("solid", window.scrollY > 24); }
+  onScroll(); window.addEventListener("scroll", onScroll, { passive: true });
+
+  var els = document.querySelectorAll(".reveal");
+  if ("IntersectionObserver" in window) {
+    var io = new IntersectionObserver(function (es) {
+      es.forEach(function (e) { if (e.isIntersecting) { e.target.classList.add("in"); io.unobserve(e.target); } });
+    }, { threshold: .15 });
+    els.forEach(function (el) { io.observe(el); });
+  } else { els.forEach(function (el) { el.classList.add("in"); }); }
+
+  // rails
+  document.querySelectorAll("[data-rail]").forEach(function (b) {
+    b.addEventListener("click", function () {
+      document.getElementById(b.dataset.rail).scrollBy({ left: b.dataset.dir * 280, behavior: "smooth" });
+    });
+  });
+
+  // ---- videos: load when near the viewport, play only while visible, one sound at a time ----
+  var reduce = window.matchMedia && matchMedia("(prefers-reduced-motion: reduce)").matches;
+  var vids = Array.prototype.slice.call(document.querySelectorAll(".vid video"));
+
+  function tryPlay(v) {
+    v.muted = v.dataset.userSound ? false : true;
+    var p = v.play();
+    if (p && p.catch) p.catch(function () { v.controls = true; });  // autoplay blocked → show controls
+  }
+  function ensureSrc(v) {
+    if (v.dataset.src && !v.getAttribute("src")) { v.src = v.dataset.src; v.load(); }
+  }
+
+  if ("IntersectionObserver" in window) {
+    var near = new IntersectionObserver(function (es) {
+      es.forEach(function (e) { if (e.isIntersecting) { ensureSrc(e.target); near.unobserve(e.target); } });
+    }, { rootMargin: "400px 0px" });
+    var vis = new IntersectionObserver(function (es) {
+      es.forEach(function (e) {
+        var v = e.target;
+        if (e.isIntersecting) { ensureSrc(v); if (!reduce) tryPlay(v); else v.controls = true; }
+        else { v.pause(); }
+      });
+    }, { threshold: .45 });
+    vids.forEach(function (v) { near.observe(v); vis.observe(v); });
+  } else {
+    vids.forEach(function (v) { ensureSrc(v); v.controls = true; });
+  }
+
+  document.querySelectorAll(".snd").forEach(function (btn) {
+    var v = btn.parentNode.querySelector("video");
+    btn.addEventListener("click", function () {
+      var turnOn = v.muted;
+      vids.forEach(function (o) { o.muted = true; delete o.dataset.userSound; var b = o.parentNode.querySelector(".snd"); if (b) { b.textContent = "🔇"; b.classList.remove("on"); } });
+      if (turnOn) { v.muted = false; v.dataset.userSound = "1"; btn.textContent = "🔊"; btn.classList.add("on"); tryPlay(v); }
+    });
+  });
+})();
+</script>
+</body>
+</html>
